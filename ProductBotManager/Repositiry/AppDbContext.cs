@@ -1,19 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ProductBotManager.Repositiry.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProductBotManager.Repositiry.Entity
+namespace ProductBotManager.Repositiry
 {
     internal class AppDbContext : DbContext
     {
         public DbSet<Products> Products { get; set; }
-        public DbSet<Categories> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Archive> Archives { get; set; }
+        public DbSet<Shop> Shops { get; set; }
         public AppDbContext()
         {
-            Database.EnsureCreated();
+            Task.Run(async () => await Database.EnsureCreatedAsync());
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
