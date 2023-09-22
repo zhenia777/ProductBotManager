@@ -12,6 +12,6 @@ namespace ProductBotManager.Repositiry.Entity
         public int? UserId { get; set; }
         public Users? User { get; set; }
         public int? ProductId { get; set; }
-        public Products? Products { get; set; }
+        public Product? Products { get; set; }
     }
 }

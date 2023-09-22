@@ -12,11 +12,11 @@ namespace ProductBotManager.Repositiry.Entity
         public int? UserId { get; set; }
         public Users? User { get; set; }
         public int? ProductId { get; set; }
-        public Products? Products { get; set; }
+        public Product? Products { get; set; }
         public string? ProductName { get; set; }
-        public DateTime? ProductExpirationDate { get; set; }
+        public DateTime? ExpirationDate { get; set; }
         public int? ProductCount { get; set; }
-        public string? CategoryId { get; set; }
+        public int? CategoryId { get; set; }
         public string? ShopId { get; set; }
         public Decimal? Price { get; set; }
 

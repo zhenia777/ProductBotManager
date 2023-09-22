@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal class Products : AddedDateEntity, IEntity
+    internal class Product : AddedDateEntity, IEntity
     {
         public int Id { get; set; }
         [Required]

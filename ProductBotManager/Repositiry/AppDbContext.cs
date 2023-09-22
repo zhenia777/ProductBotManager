@@ -10,7 +10,7 @@ namespace ProductBotManager.Repositiry
 {
     internal class AppDbContext : DbContext
     {
-        public DbSet<Products> Products { get; set; }
+        public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Archive> Archives { get; set; }
         public DbSet<Shop> Shops { get; set; }
