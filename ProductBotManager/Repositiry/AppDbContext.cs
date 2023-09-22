@@ -14,6 +14,8 @@ namespace ProductBotManager.Repositiry
         public DbSet<Category> Categories { get; set; }
         public DbSet<Archive> Archives { get; set; }
         public DbSet<Shop> Shops { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<Favorite_Product> favorite_Products { get; set; }
         public AppDbContext()
         {
             Task.Run(async () => await Database.EnsureCreatedAsync());
