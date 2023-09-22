@@ -17,7 +17,7 @@ namespace ProductBotManager.Repositiry.Entity
         public DateTime? ExpirationDate { get; set; }
         public int? ProductCount { get; set; }
         public int? CategoryId { get; set; }
-        public string? ShopId { get; set; }
+        public int? ShopId { get; set; }
         public Decimal? Price { get; set; }
 
     }
