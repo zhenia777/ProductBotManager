@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal class Favorite_Product : IEntity
+    internal class FavoriteProduct : IEntity
     {
         public int Id { get; set; }
         public int? UserId { get; set; }

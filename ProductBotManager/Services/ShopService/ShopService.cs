@@ -53,5 +53,15 @@ namespace ProductBotManager.Services.ShopService
                          .State = EntityState.Modified;
             await _appDbContext.SaveChangesAsync();
         }
+        public async void ChangeLocation(int idShop, int idLocation )
+        {
+            var change = await _appDbContext.Shops.FirstOrDefaultAsync(x => x.Id == idShop);
+            if (change == null)
+            {
+                return;
+            }
+            change.LocationId = idLocation;
+            await _appDbContext.SaveChangesAsync();
+        }
     }
 }

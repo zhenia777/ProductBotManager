@@ -72,6 +72,8 @@ namespace ProductBotManager.Services.ProductService
             }
 
             await appDbContext.Archives.AddAsync(del.CreateArchive());
+            appDbContext.Products.Remove(del);
+            await appDbContext.SaveChangesAsync();
             //delete from Products
             //save
         }
