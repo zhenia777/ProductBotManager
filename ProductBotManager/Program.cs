@@ -4,6 +4,7 @@ using ProductBotManager.Services.CategoryService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.ShopService;
+using ProductBotManager.TgBot;
 
 var services = new ServiceCollection()
     .AddTransient<AppDbContext>()
@@ -12,3 +13,7 @@ var services = new ServiceCollection()
     .AddTransient<IProductService, ProductService>()
     .AddTransient<IShopService, ShopService>();
 
+using var provider = services.BuildServiceProvider();
+
+
+TgBot tgBot = provider.GetService<TgBot>();
