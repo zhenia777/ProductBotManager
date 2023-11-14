@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ProductBotManager.Services.TokenService
+namespace ProductBotManager.Services.LogService
 {
-    public interface ITokenService
+    public interface ILogService
     {
-        public string Token { get; }
-        
+        void Log(string message);
     }
 }

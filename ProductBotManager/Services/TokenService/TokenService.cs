@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Services.TokenService
 {
-    internal class TokenService:ITokenService
+    public class TokenService:ITokenService
     {
-        public string Token => "<token>";
+        public string Token => "6291700272:AAHfskwunI-eJXbmosMqlGf-WW-Pg1k34os";
     }
 }
