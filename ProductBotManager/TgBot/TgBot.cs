@@ -1,4 +1,5 @@
-﻿using ProductBotManager.Services.CategoryService;
+﻿using ProductBotManager.Helpers;
+using ProductBotManager.Services.CategoryService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
 using ProductBotManager.Services.ProductService;
@@ -50,7 +51,7 @@ public class TgBot
     {
         if(update.Message.From.Id == )
         {
-
+            
         }
         return Task.CompletedTask;
     }
