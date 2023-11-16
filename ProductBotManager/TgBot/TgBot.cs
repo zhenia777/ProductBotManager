@@ -3,6 +3,7 @@ using ProductBotManager.Services.CategoryService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
 using ProductBotManager.Services.ProductService;
+using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.ShopService;
 using ProductBotManager.Services.TokenService;
 using Telegram.Bot;
@@ -13,24 +14,16 @@ namespace ProductBotManager.TgBot;
 public class TgBot
 {
     private TelegramBotClient client;
-    private readonly ICategoryService _categoryService;
-    private readonly ILocationService _locationService;
-    private readonly IProductService _productService;
-    private readonly IShopService _shopService;
     private readonly ILogService _logService;
+    private readonly IRegistrationService _registrationService;
     public TgBot(ITokenService tokenService,
-                 //ICategoryService categoryService,
-                 //ILocationService locationService,
-                 //IProductService productService,
-                 //IShopService shopService,
-                 ILogService logService)
+                 IRegistrationService registrationService,
+                 ILogService logService
+        )
     {
         client = new TelegramBotClient(tokenService.Token);
-        //_categoryService = categoryService;
-        //_locationService = locationService;
-        //_productService = productService;
-        //_shopService = shopService;
         _logService = logService;
+        _registrationService = registrationService;
     }
     #region -- Public Methods -- 
     public async Task GetInfo()
@@ -47,13 +40,12 @@ public class TgBot
 
     #endregion
     #region -- Private Methods --
-    private Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
+    private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
     {
-        if(update.Message.From.Id == )
+        if(update.Message.Text == "/start" )
         {
-            
+            await _registrationService.SignUp(update.Message.From.ToUsers());
         }
-        return Task.CompletedTask;
     }
 
     private Task ErrorHandler(ITelegramBotClient bot, Exception ex, CancellationToken clt)

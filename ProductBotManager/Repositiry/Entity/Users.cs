@@ -2,10 +2,11 @@
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal class Users : AddedDateEntity, IEntity
+    public class Users : AddedDateEntity, IEntity
     {
         public int Id { get; set; }
-        public int TgId { get; set; }
+        [Required]
+        public long TgId { get; set; }
         [Required]
         public string? Name { get; set; }
         public string? LastName { get; set; }

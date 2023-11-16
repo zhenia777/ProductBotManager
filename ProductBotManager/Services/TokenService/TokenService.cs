@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using ProductBotManager.Helpers.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +10,11 @@ namespace ProductBotManager.Services.TokenService
 {
     public class TokenService:ITokenService
     {
-        public string Token => "6291700272:AAHfskwunI-eJXbmosMqlGf-WW-Pg1k34os";
+        public TokenService()
+        {
+            string json = File.ReadAllText("app_config.json");
+            Token = JsonConvert.DeserializeObject<Config>(json).TgToken;
+        }
+        public string Token { get; }
     }
 }

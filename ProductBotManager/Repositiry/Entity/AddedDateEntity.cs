@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal abstract class AddedDateEntity
+    public abstract class AddedDateEntity
     {
         public AddedDateEntity() => AddedDate = DateTime.UtcNow;
         public DateTime AddedDate { get; set; }
