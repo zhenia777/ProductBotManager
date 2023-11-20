@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using ProductBotManager.Repositiry;
+using ProductBotManager.Services.AdminsIdService;
 using ProductBotManager.Services.CategoryService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
@@ -18,7 +19,8 @@ var services = new ServiceCollection()
     .AddTransient<ILogService, LogService>()
     .AddTransient<ITokenService, TokenService>()
     .AddTransient<TgBot>()
-    .AddTransient<IRegistrationService, RegistrationService>();
+    .AddTransient<IRegistrationService, RegistrationService>()
+    .AddTransient<IAdminsIdService, AdminsIdService>();
 
 using var provider = services.BuildServiceProvider();
 

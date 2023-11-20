@@ -9,5 +9,6 @@ namespace ProductBotManager.Helpers.Models
     internal class Config
     {
         public string TgToken {  get; set; }
+        public string[] Admins { get; set; }
     }
 }
