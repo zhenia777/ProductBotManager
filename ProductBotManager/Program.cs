@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ProductBotManager.Repositiry;
 using ProductBotManager.Services.AdminsIdService;
 using ProductBotManager.Services.CategoryService;
@@ -8,10 +9,12 @@ using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.ShopService;
 using ProductBotManager.Services.TokenService;
+using ProductBotManager.Services.UserService;
 using ProductBotManager.TgBot;
 
 var services = new ServiceCollection()
-    .AddTransient<AppDbContext>()
+    //ConnectionString
+    .AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=DbProdBotManager.db "))
     .AddTransient<ICategoryService, CategoryService>()
     .AddTransient<ILocationService, LocationService>()
     .AddTransient<IProductService, ProductService>()
@@ -20,7 +23,8 @@ var services = new ServiceCollection()
     .AddTransient<ITokenService, TokenService>()
     .AddTransient<TgBot>()
     .AddTransient<IRegistrationService, RegistrationService>()
-    .AddTransient<IAdminsIdService, AdminsIdService>();
+    .AddTransient<IAdminsIdService, AdminsIdService>()
+    .AddTransient<IUserService, UserService>();
 
 using var provider = services.BuildServiceProvider();
 

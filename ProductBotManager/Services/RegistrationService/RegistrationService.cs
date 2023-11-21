@@ -14,7 +14,7 @@ namespace ProductBotManager.Services.RegistrationService
         private readonly AppDbContext _appDBcontext;
         public RegistrationService(AppDbContext appDBcontext)
         {
-            appDBcontext = _appDBcontext;
+            _appDBcontext = appDBcontext;
         }
         public async Task SignUp(Users users) 
         {
@@ -23,6 +23,7 @@ namespace ProductBotManager.Services.RegistrationService
                 return;
             }
             _appDBcontext.Users.Add(users);
+            await _appDBcontext.SaveChangesAsync();
         }
 
 

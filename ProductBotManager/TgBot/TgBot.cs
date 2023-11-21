@@ -1,19 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
-using ProductBotManager.Helpers;
-using ProductBotManager.Helpers.Models;
-using ProductBotManager.Repositiry;
-using ProductBotManager.Repositiry.Entity;
+﻿using ProductBotManager.Helpers;
 using ProductBotManager.Services.AdminsIdService;
-using ProductBotManager.Services.CategoryService;
-using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
-using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.RegistrationService;
-using ProductBotManager.Services.ShopService;
 using ProductBotManager.Services.TokenService;
 using ProductBotManager.Services.UserService;
-using System.Xml.Linq;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -37,7 +27,7 @@ public class TgBot
         client = new TelegramBotClient(tokenService.Token);
         _logService = logService;
         _registrationService = registrationService;
-        _adminsIdService= adminsIdService;
+        _adminsIdService = adminsIdService;
         _userService = userService;
     }
     #region -- Public Methods -- 
@@ -57,28 +47,33 @@ public class TgBot
     #region -- Private Methods --
     private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
     {
-        if(update.Message.Text == "/start" )
+        if (update.Message.Text == "/start")
         {
             await _registrationService.SignUp(update.Message.From.ToUsers());
-        }
 
-        Users users = new Users();
-        if (_adminsIdService.AdminsId.Any(id => users.TgId == long.Parse(id)))
-        {
-            ReplyKeyboardMarkup replyKeyboardMarkup = new(new KeyboardButton[][]
-               {
-               new KeyboardButton[]{ "Get bot users!" }
-               });
+            if (_adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
+            {
 
-            
-            var allTgIds = string.Join(", ", _userService.GetAll().Select(u => u.TgId));
-            
-            await client.SendTextMessageAsync(update.Message.From.Id, allTgIds);
+                ReplyKeyboardMarkup replyKeyboardMarkup = new(new KeyboardButton[][]
+                   {
+               new KeyboardButton[]{ "Get bot users!‼️🫡" }
+                   });
 
-            await client.SendTextMessageAsync(
+                await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
                 text: "Get bot users!",
                 replyMarkup: replyKeyboardMarkup);
+            }
+        }
+
+
+        if (update.Message.Text == "Get bot users!‼️\U0001fae1" && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
+        {
+            var allTgIds = string.Join(", ", _userService.GetAll().Select(u => new { u.TgId, u.Name }));
+
+            await client.SendTextMessageAsync(
+                chatId: update.Message.From.Id, 
+                text: allTgIds == string.Empty ? "No users": allTgIds);
         }
     }
 

@@ -1,21 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using ProductBotManager.Helpers;
 using ProductBotManager.Helpers.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ProductBotManager.Services.AdminsIdService
+namespace ProductBotManager.Services.AdminsIdService;
+
+public class AdminsIdService : IAdminsIdService
 {
-    public class AdminsIdService: IAdminsIdService
+    public AdminsIdService()
     {
-        public AdminsIdService() 
-        {
-            string json = File.ReadAllText("app_config.json");
-            AdminsId = JsonConvert.DeserializeObject<Config>(json).Admins;
-        }
-        public string[] AdminsId { get; }
+        string json = File.ReadAllText(Constants.APP_CONFIG_FILE);
+        AdminsId = JsonConvert.DeserializeObject<Config>(json).Admins;
     }
+    public long[] AdminsId { get; }
 }

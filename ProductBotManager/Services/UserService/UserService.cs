@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductBotManager.Repositiry;
 using ProductBotManager.Repositiry.Entity;
+using ProductBotManager.Services.LogService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,8 @@ namespace ProductBotManager.Services.UserService
     public class UserService:IUserService
     {
         private readonly AppDbContext _appDbContext;
-        public UserService(AppDbContext appDbContext)
+        public UserService(AppDbContext appDbContext,
+                           ILogService logService)
         {
             _appDbContext = appDbContext;
         }

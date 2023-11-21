@@ -8,6 +8,6 @@ namespace ProductBotManager.Services.AdminsIdService
 {
     public interface IAdminsIdService
     {
-        public string[] AdminsId { get; }
+        public long[] AdminsId { get; }
     }
 }

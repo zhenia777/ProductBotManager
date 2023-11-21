@@ -1,10 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProductBotManager.Repositiry.Entity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry
 {
@@ -21,9 +16,14 @@ namespace ProductBotManager.Repositiry
         {
             Task.Run(async () => await Database.EnsureCreatedAsync());
         }
+
+        public AppDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=DbProdBotManager.db ");
+            //optionsBuilder.UseSqlite("Data Source=DbProdBotManager.db ");
         }
 
     }

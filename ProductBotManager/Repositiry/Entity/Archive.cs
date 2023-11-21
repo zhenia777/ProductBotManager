@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal class Archive : IEntity
+    public class Archive : IEntity
     {
         public int Id { get; set; }
         public int? UserId { get; set; }

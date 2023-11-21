@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Repositiry.Entity
 {
-    internal class Location: IEntity
+    public class Location: IEntity
     {
         public int Id { get; set; }
         public double Latitude { get; set; }
