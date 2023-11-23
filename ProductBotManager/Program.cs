@@ -1,8 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver.Core.Connections;
+using Newtonsoft.Json;
+using ProductBotManager.Helpers.Models;
 using ProductBotManager.Repositiry;
 using ProductBotManager.Services.AdminsIdService;
 using ProductBotManager.Services.CategoryService;
+using ProductBotManager.Services.ConnectionStringService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
 using ProductBotManager.Services.ProductService;
@@ -14,7 +18,7 @@ using ProductBotManager.TgBot;
 
 var services = new ServiceCollection()
     //ConnectionString
-    .AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=DbProdBotManager.db "))
+    .AddDbContext<AppDbContext>(opt => opt.UseSqlite("Data Source=DbProdBotManager.db"))
     .AddTransient<ICategoryService, CategoryService>()
     .AddTransient<ILocationService, LocationService>()
     .AddTransient<IProductService, ProductService>()
@@ -24,11 +28,10 @@ var services = new ServiceCollection()
     .AddTransient<TgBot>()
     .AddTransient<IRegistrationService, RegistrationService>()
     .AddTransient<IAdminsIdService, AdminsIdService>()
-    .AddTransient<IUserService, UserService>();
+    .AddTransient<IUserService, UserService>()
+    .AddTransient<IConnectionStringService, ConnectionStringService>();
 
 using var provider = services.BuildServiceProvider();
-
-
 
 TgBot tgBot = provider.GetService<TgBot>();
 

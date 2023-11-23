@@ -56,7 +56,7 @@ public class TgBot
 
                 ReplyKeyboardMarkup replyKeyboardMarkup = new(new KeyboardButton[][]
                    {
-               new KeyboardButton[]{ "Get bot users!‼️🫡" }
+               new KeyboardButton[]{ Constants.SEND_USER_BUTTON }
                    });
 
                 await client.SendTextMessageAsync(
@@ -67,7 +67,7 @@ public class TgBot
         }
 
 
-        if (update.Message.Text == "Get bot users!‼️\U0001fae1" && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
+        if (update.Message.Text == Constants.SEND_USER_BUTTON && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
         {
             var allTgIds = string.Join(", ", _userService.GetAll().Select(u => new { u.TgId, u.Name }));
 

@@ -10,5 +10,6 @@ namespace ProductBotManager.Helpers.Models
     {
         public string TgToken {  get; set; }
         public long[] Admins { get; set; }
+        public string ConnectionString { get;set; }
     }
 }
