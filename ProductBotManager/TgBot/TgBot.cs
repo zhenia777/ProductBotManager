@@ -56,7 +56,7 @@ public class TgBot
 
                 ReplyKeyboardMarkup replyKeyboardMarkup = new(new KeyboardButton[][]
                    {
-               new KeyboardButton[]{ Constants.SEND_USER_BUTTON }
+                        new KeyboardButton[]{ Constants.SEND_USER_BUTTON }
                    });
 
                 await client.SendTextMessageAsync(
