@@ -14,10 +14,12 @@ public class BarcodeLookupServiceTests
     [TestMethod()]
     public void GetTest()
     {
-        int expected = 10;
+        string expected = "Name";
 
         //logic
-        int actual = 10;
+        BarcodeLookupService service = new ();
+
+        string actual = service.Get("4823097405932").Name;
         Assert.AreEqual(expected,actual, $"Expected: {expected}, but actual:{actual}");
     }
 }
