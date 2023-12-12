@@ -14,12 +14,12 @@ public class BarcodeLookupServiceTests
     [TestMethod()]
     public void GetTest()
     {
-        string expected = "Name";
+        string expected = "3 Pack Schedro Ketchup Delicate GMO Free 9 OZ / 250 Gr Product of Ukraine";
 
         //logic
         BarcodeLookupService service = new ();
 
-        string actual = service.Get("4823097405932").Name;
+        string actual = service.Get("4823097405932").Result.Name;
         Assert.AreEqual(expected,actual, $"Expected: {expected}, but actual:{actual}");
     }
 }

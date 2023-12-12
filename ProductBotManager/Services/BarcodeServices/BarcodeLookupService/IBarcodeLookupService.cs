@@ -9,5 +9,5 @@ namespace ProductBotManager.Services.BarcodeServices.BarcodeLookupService;
 
 public interface IBarcodeLookupService
 {
-    Product Get(string barcode);
+    Task<Product> Get(string barcode);
 }
