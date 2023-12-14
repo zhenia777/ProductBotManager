@@ -18,6 +18,7 @@ namespace ProductBotManager.Helpers
         }
         public static string APP_CONFIG_FILE { get;} = "app_config.json";
         public static string SEND_USER_BUTTON { get;} = "Get bot users!";
+        public static string CHECK_PRODUCT_BUTTON { get; } = "Check my product!";
         public static string CONNECTION_STRING { get; }
         //Buttons
     }

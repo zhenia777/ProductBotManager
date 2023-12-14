@@ -1,12 +1,15 @@
 ﻿using ProductBotManager.Helpers;
 using ProductBotManager.Services.AdminsIdService;
+using ProductBotManager.Services.BarcodeServices.BarcodeLookupService;
 using ProductBotManager.Services.LogService;
 using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.TokenService;
 using ProductBotManager.Services.UserService;
+using System.Drawing;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using ZXing;
 
 namespace ProductBotManager.TgBot;
 
@@ -17,11 +20,13 @@ public class TgBot
     private readonly IRegistrationService _registrationService;
     private readonly IAdminsIdService _adminsIdService;
     private readonly IUserService _userService;
+    private readonly IBarcodeLookupService _barcodeLookupService;
     public TgBot(ITokenService tokenService,
                  IRegistrationService registrationService,
                  ILogService logService,
                  IAdminsIdService adminsIdService,
-                 IUserService userService
+                 IUserService userService,
+                 IBarcodeLookupService barcodeLookupService
         )
     {
         client = new TelegramBotClient(tokenService.Token);
@@ -29,6 +34,7 @@ public class TgBot
         _registrationService = registrationService;
         _adminsIdService = adminsIdService;
         _userService = userService;
+        _barcodeLookupService = barcodeLookupService;
     }
     #region -- Public Methods -- 
     public async Task GetInfo()
@@ -47,6 +53,37 @@ public class TgBot
     #region -- Private Methods --
     private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
     {
+        if(update.Message.Type == Telegram.Bot.Types.Enums.MessageType.Photo)
+        {
+            var fileId = update.Message.Photo.Last().FileId;
+            var fileInfo = await client.GetFileAsync(fileId);
+            using Stream fileStream = new MemoryStream();
+            await client.DownloadFileAsync(
+                fileInfo.FilePath,
+                fileStream
+                ) ;
+
+            BarcodeReader barcodeReader = new BarcodeReader();
+            
+            Bitmap bitmap = new Bitmap(fileStream);
+            var convertBitmap = new BitmapLuminanceSource(bitmap);
+            var resultReading = barcodeReader.Decode(convertBitmap);
+            if(resultReading == null)
+            {
+                await client.SendTextMessageAsync(
+                    update.Message.From.Id,
+                    text: "I couldn`t read your photo! ((");
+            }
+            else
+            {
+                
+                await client.SendTextMessageAsync(
+                    update.Message.From.Id,
+                    text: (await _barcodeLookupService.Get(resultReading.Text)).Name);
+            }
+
+
+        }
         if (update.Message.Text == "/start")
         {
             await _registrationService.SignUp(update.Message.From.ToUsers());
@@ -64,6 +101,21 @@ public class TgBot
                 text: "Get bot users!",
                 replyMarkup: replyKeyboardMarkup);
             }
+            ReplyKeyboardMarkup checkBarcode = new(new KeyboardButton[][]
+            {
+                new KeyboardButton[] {Constants.CHECK_PRODUCT_BUTTON}
+            });
+            await client.SendTextMessageAsync(
+                chatId: update.Message.From.Id,
+                text: "Check my product!",
+                replyMarkup: checkBarcode);
+            
+        }
+        if(update.Message.Text == Constants.CHECK_PRODUCT_BUTTON)
+        {
+            await client.SendTextMessageAsync(
+                chatId: update.Message.From.Id,
+                text: "Send me your barcode!");
         }
 
 

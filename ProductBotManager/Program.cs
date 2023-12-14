@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ProductBotManager.Helpers;
 using ProductBotManager.Repositiry;
 using ProductBotManager.Services.AdminsIdService;
+using ProductBotManager.Services.BarcodeServices.BarcodeLookupService;
 using ProductBotManager.Services.CategoryService;
 using ProductBotManager.Services.LocationService;
 using ProductBotManager.Services.LogService;
@@ -25,7 +26,8 @@ var services = new ServiceCollection()
     .AddTransient<TgBot>()
     .AddTransient<IRegistrationService, RegistrationService>()
     .AddTransient<IAdminsIdService, AdminsIdService>()
-    .AddTransient<IUserService, UserService>();
+    .AddTransient<IUserService, UserService>()
+    .AddTransient<IBarcodeLookupService, BarcodeLookupService>() ;
 
 using var provider = services.BuildServiceProvider();
 
