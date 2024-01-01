@@ -53,10 +53,22 @@ public class BarcodeLookupService : IBarcodeLookupService
         int index = content.IndexOf("edit-product-btn");
         int indexStart = content.IndexOf("h4", index);
         int indexEnd = content.IndexOf("h4", indexStart+1);
-        
         string name = content.Substring(indexStart+3, indexEnd - indexStart-3-3)
                              .Trim(' ', '\n', '\r');
 
-        return new Product() {Name = name };
+        //int index1 = content.IndexOf("Manufacturer:");
+        //int indexStart1 = content.IndexOf("span class=", index1);
+        //int indexEnd1 = content.IndexOf("span", indexStart1 + 1);
+        //string manufacturer = content.Substring(indexStart1 + 1, indexEnd1 - indexStart1 - 3 - 3)
+        //                     .Trim(' ', '\n', '\r');
+
+        //int index2 = content.IndexOf("Walmart:");
+        //int indexStart2 = content.IndexOf("span class=", index2);
+        //int indexEnd2 = content.IndexOf("span", indexStart2 + 1);
+        //string price = content.Substring(indexStart2 + 1, indexEnd2 - indexStart2 - 3 - 3)
+        //                     .Trim(' ', '\n', '\r');
+
+        return new Product() { Name = name };
+       
     }
 }
