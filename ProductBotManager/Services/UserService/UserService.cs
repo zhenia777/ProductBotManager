@@ -35,5 +35,9 @@ namespace ProductBotManager.Services.UserService
 
         public async Task<Users?> GetById(int id)
             => await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+        public async Task<int> GetMyId(long telegramId)
+        {
+            return (await _appDbContext.Users.FirstAsync(x => x.TgId == telegramId)).Id;
+        }
     }
 }

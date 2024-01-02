@@ -13,5 +13,6 @@ namespace ProductBotManager.Services.UserService
         IQueryable<Users> GetAll();
         void Delete(int id);
         Task<Users?> GetById(int id);
+        Task<int> GetMyId(long telegramId);
     }
 }

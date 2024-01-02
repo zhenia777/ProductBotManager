@@ -20,6 +20,8 @@ namespace ProductBotManager.Helpers
         public static string SEND_USER_BUTTON { get;} = "Get bot users!";
         public static string CHECK_PRODUCT_BUTTON { get; } = "Check my product!";
         public static string CONNECTION_STRING { get; }
+        public static string ADD_FAVORITE_PRODUCTS { get; } = "Add favorite!";
+        public static string ADD_PRODUCTS { get; } = "Add general";
         //Buttons
     }
 }

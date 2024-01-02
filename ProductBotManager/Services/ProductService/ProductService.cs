@@ -92,5 +92,7 @@ namespace ProductBotManager.Services.ProductService
         {
             throw new NotImplementedException();
         }
+
+        // TODO: CreateAddFavoriteMethod
     }
 }

@@ -2,12 +2,14 @@
 using ProductBotManager.Services.AdminsIdService;
 using ProductBotManager.Services.BarcodeServices.BarcodeLookupService;
 using ProductBotManager.Services.LogService;
+using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.TokenService;
 using ProductBotManager.Services.UserService;
 using System.Drawing;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using ZXing;
 
@@ -21,12 +23,14 @@ public class TgBot
     private readonly IAdminsIdService _adminsIdService;
     private readonly IUserService _userService;
     private readonly IBarcodeLookupService _barcodeLookupService;
+    private readonly IProductService _productService;
     public TgBot(ITokenService tokenService,
                  IRegistrationService registrationService,
                  ILogService logService,
                  IAdminsIdService adminsIdService,
                  IUserService userService,
-                 IBarcodeLookupService barcodeLookupService
+                 IBarcodeLookupService barcodeLookupService,
+                 IProductService productService
         )
     {
         client = new TelegramBotClient(tokenService.Token);
@@ -35,6 +39,7 @@ public class TgBot
         _adminsIdService = adminsIdService;
         _userService = userService;
         _barcodeLookupService = barcodeLookupService;
+        _productService = productService;
     }
     #region -- Public Methods -- 
     public async Task GetInfo()
@@ -53,7 +58,22 @@ public class TgBot
     #region -- Private Methods --
     private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
     {
-        if(update.Message.Type == Telegram.Bot.Types.Enums.MessageType.Photo)
+        if(update.Type == UpdateType.CallbackQuery)
+        {
+            var data = update.CallbackQuery.Data;
+            var product = await _barcodeLookupService.Get(data.Substring(data.IndexOf(';')));
+            product.UserId = await _userService.GetMyId(update.CallbackQuery.From.Id);
+            if(data.Contains(Constants.ADD_PRODUCTS))
+            {
+                _productService.Add(product);
+            }
+            else if(data.Contains(Constants.ADD_FAVORITE_PRODUCTS))
+            {
+                _productService.Add(product);
+
+            }
+        }
+        if(update.Message.Type == MessageType.Photo)
         {
             var fileId = update.Message.Photo.Last().FileId;
             var fileInfo = await client.GetFileAsync(fileId);
@@ -76,11 +96,26 @@ public class TgBot
             }
             else
             {
-                
+                InlineKeyboardMarkup inlineKeyboard = new(new[]
+                {
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(Constants.ADD_FAVORITE_PRODUCTS
+                        ,Constants.ADD_FAVORITE_PRODUCTS + ";"+ resultReading.Text)
+                    },
+                    new[]
+                    {
+                        InlineKeyboardButton.WithCallbackData(Constants.ADD_PRODUCTS
+                        ,Constants.ADD_PRODUCTS + ";" + resultReading.Text)
+                    }
+                });
                 await client.SendTextMessageAsync(
                     update.Message.From.Id,
-                    text: (await _barcodeLookupService.Get(resultReading.Text)).Name);
+                    text: (await _barcodeLookupService.Get(resultReading.Text)).Name, 
+                    replyMarkup: inlineKeyboard);
+
             }
+
 
 
         }
@@ -111,7 +146,13 @@ public class TgBot
                 replyMarkup: checkBarcode);
             
         }
-        if(update.Message.Text == Constants.CHECK_PRODUCT_BUTTON)
+        HandleUser(update);
+        
+    }
+
+    private async void HandleUser (Update update)
+    {
+        if (update.Message.Text == Constants.CHECK_PRODUCT_BUTTON)
         {
             await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
@@ -124,11 +165,10 @@ public class TgBot
             var allTgIds = string.Join(", ", _userService.GetAll().Select(u => new { u.TgId, u.Name }));
 
             await client.SendTextMessageAsync(
-                chatId: update.Message.From.Id, 
-                text: allTgIds == string.Empty ? "No users": allTgIds);
+                chatId: update.Message.From.Id,
+                text: allTgIds == string.Empty ? "No users" : allTgIds);
         }
     }
-
     private Task ErrorHandler(ITelegramBotClient bot, Exception ex, CancellationToken clt)
     {
         _logService.Log($"TG Bot Error -> \n{ex}");
