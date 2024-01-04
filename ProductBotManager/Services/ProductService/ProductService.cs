@@ -18,13 +18,13 @@ namespace ProductBotManager.Services.ProductService
         {
             appDbContext = _appDbContext;
         }
-        public async void Add(Product product)
+        public async Task Add(Product product)
         {
            await appDbContext.Products.AddAsync(product);
            await appDbContext.SaveChangesAsync();
         }
 
-        public async void ChangeCategory(int idProduct, int idCategory)
+        public async Task ChangeCategory(int idProduct, int idCategory)
         {
             var change = await appDbContext.Products.FirstOrDefaultAsync(x => x.Id == idProduct);
             if(change == null) 
@@ -36,7 +36,7 @@ namespace ProductBotManager.Services.ProductService
 
         }
 
-        public async void ChangePrice(int id, decimal newPrice)
+        public async Task ChangePrice(int id, decimal newPrice)
         {
             var change = await appDbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
             if(change == null) 
@@ -47,7 +47,7 @@ namespace ProductBotManager.Services.ProductService
             await appDbContext.SaveChangesAsync();
         }
 
-        public async void Decrease(int id)
+        public async Task Decrease(int id)
         {
             var change = await appDbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
             if (change == null)
@@ -78,20 +78,29 @@ namespace ProductBotManager.Services.ProductService
             //save
         }
 
-        public IQueryable<Product> GetAllProducts(int userId)
+        public async Task<IQueryable<Product>> GetAllProducts(long TgUserId)
         {
-            throw new NotImplementedException();
+           var user = await appDbContext.Users.FirstOrDefaultAsync(x => x.TgId == TgUserId);
+           var products = appDbContext.Products.Where(x => x.UserId == user.Id);
+           return products;
         }
 
-        public void Increase(int id)
+        public async Task Increase(int id)
         {
-            throw new NotImplementedException();
+            var product = await appDbContext.Products.FirstOrDefaultAsync(x => x.Id == id);
+            if(product == null)
+            {
+                return;
+            }
+            product.Count++;
+            await appDbContext.SaveChangesAsync();
         }
 
-        public void Update(int id)
-        {
-            throw new NotImplementedException();
-        }
+        //public void Update(int id)
+        //{
+
+        //    throw new NotImplementedException();
+        //}
 
         // TODO: CreateAddFavoriteMethod
     }

@@ -8,17 +8,17 @@ using System.Threading.Tasks;
 
 namespace ProductBotManager.Services.ProductService
 {
-    internal interface IProductService
+    public interface IProductService
     {
 
-        public void Add(Product product);
-        public void Update(int id);
-        public void Increase(int id);
-        public void Decrease(int id);
+        public Task Add(Product product);
+        //public void Update(int id);
+        public Task Increase(int id);
+        public Task Decrease(int id);
 
-        public void ChangeCategory(int idProduct, int idCategory);
-        public void ChangePrice(int id, decimal newPrice);
-        public IQueryable<Product> GetAllProducts(int userId);
+        public Task ChangeCategory(int idProduct, int idCategory);
+        public Task ChangePrice(int id, decimal newPrice);
+        public Task<IQueryable<Product>> GetAllProducts(long TgUserId);
         public Task Delete(int id);
     }
 }

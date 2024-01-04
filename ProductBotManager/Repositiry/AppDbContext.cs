@@ -14,7 +14,8 @@ namespace ProductBotManager.Repositiry
         public DbSet<Users> Users { get; set; }
         public AppDbContext()
         {
-            Task.Run(async () => await Database.EnsureCreatedAsync());
+            //Task.Run(async () => await Database.EnsureCreatedAsync());
+            Database.EnsureCreated();
         }
 
         public AppDbContext(DbContextOptions options) : base(options)

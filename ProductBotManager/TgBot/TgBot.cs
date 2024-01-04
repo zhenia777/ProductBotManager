@@ -60,16 +60,17 @@ public class TgBot
     {
         if(update.Type == UpdateType.CallbackQuery)
         {
+            
             var data = update.CallbackQuery.Data;
             var product = await _barcodeLookupService.Get(data.Substring(data.IndexOf(';')));
             product.UserId = await _userService.GetMyId(update.CallbackQuery.From.Id);
             if(data.Contains(Constants.ADD_PRODUCTS))
             {
-                _productService.Add(product);
+                await _productService.Add(product);
             }
             else if(data.Contains(Constants.ADD_FAVORITE_PRODUCTS))
             {
-                _productService.Add(product);
+               await _productService.Add(product);
 
             }
         }
@@ -116,7 +117,7 @@ public class TgBot
 
             }
 
-
+            
 
         }
         if (update.Message.Text == "/start")
@@ -158,7 +159,23 @@ public class TgBot
                 chatId: update.Message.From.Id,
                 text: "Send me your barcode!");
         }
-
+        if(update.Message.Text == Constants.MY_PRODUCTS)
+        {
+            
+            var products = await _productService.GetAllProducts(update.Message.From.Id);
+            if(products == null)
+            {
+                await client.SendTextMessageAsync(
+                chatId: update.Message.From.Id,
+                text: "No products!");
+                return;
+            }
+            string productsList = string.Join('\n', products.Select(x=>x.Name));
+            await client.SendTextMessageAsync(
+                chatId: update.Message.From.Id,
+                text: productsList);
+            
+        }
 
         if (update.Message.Text == Constants.SEND_USER_BUTTON && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
         {
