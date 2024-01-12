@@ -20,6 +20,8 @@ namespace ProductBotManager.Services.ProductService
         }
         public async Task Add(Product product)
         {
+
+            product.ExpirationDate = DateTime.UtcNow.AddDays(5);
            await appDbContext.Products.AddAsync(product);
            await appDbContext.SaveChangesAsync();
         }

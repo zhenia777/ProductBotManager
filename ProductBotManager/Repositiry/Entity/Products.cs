@@ -12,7 +12,7 @@ namespace ProductBotManager.Repositiry.Entity
         public int Id { get; set; }
         [Required]
         public string? Name { get; set; }
-        public int Count { get; set; } = 0;
+        public int Count { get; set; } = 1;
         [Required]
         public DateTime? ExpirationDate { get; set; }
         public int? CategoryId { get; set; }

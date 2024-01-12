@@ -37,6 +37,11 @@ namespace ProductBotManager.Services.UserService
             => await _appDbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
         public async Task<int> GetMyId(long telegramId)
         {
+            var userExist = await _appDbContext.Users.AnyAsync(x => x.TgId == telegramId);
+            if (!userExist)
+            {
+                Add(new Users() { TgId = telegramId, Name = ""});
+            }
             return (await _appDbContext.Users.FirstAsync(x => x.TgId == telegramId)).Id;
         }
     }

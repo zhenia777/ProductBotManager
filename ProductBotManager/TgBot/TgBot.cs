@@ -1,10 +1,12 @@
 ﻿using ProductBotManager.Helpers;
+using ProductBotManager.Repositiry.Entity;
 using ProductBotManager.Services.AdminsIdService;
 using ProductBotManager.Services.BarcodeServices.BarcodeLookupService;
 using ProductBotManager.Services.LogService;
 using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.TokenService;
+using ProductBotManager.Services.UpcitemdbService;
 using ProductBotManager.Services.UserService;
 using System.Drawing;
 using Telegram.Bot;
@@ -17,6 +19,7 @@ namespace ProductBotManager.TgBot;
 
 public class TgBot
 {
+    private Dictionary<string, Product> buffer = new();
     private TelegramBotClient client;
     private readonly ILogService _logService;
     private readonly IRegistrationService _registrationService;
@@ -24,13 +27,15 @@ public class TgBot
     private readonly IUserService _userService;
     private readonly IBarcodeLookupService _barcodeLookupService;
     private readonly IProductService _productService;
+    private readonly IUpcitemdbService _upcitemdbService;
     public TgBot(ITokenService tokenService,
                  IRegistrationService registrationService,
                  ILogService logService,
                  IAdminsIdService adminsIdService,
                  IUserService userService,
                  IBarcodeLookupService barcodeLookupService,
-                 IProductService productService
+                 IProductService productService,
+                 IUpcitemdbService upcitemdbService
         )
     {
         client = new TelegramBotClient(tokenService.Token);
@@ -40,6 +45,7 @@ public class TgBot
         _userService = userService;
         _barcodeLookupService = barcodeLookupService;
         _productService = productService;
+        _upcitemdbService = upcitemdbService;
     }
     #region -- Public Methods -- 
     public async Task GetInfo()
@@ -56,25 +62,59 @@ public class TgBot
 
     #endregion
     #region -- Private Methods --
+    private async Task CallbackQueryHandler(Update update)
+    {
+        try
+        {
+            await client.AnswerCallbackQueryAsync(update.CallbackQuery.Id);
+        }
+        catch{return;}
+
+        var data = update.CallbackQuery.Data;
+
+        int userId = await _userService.GetMyId(update.CallbackQuery.From.Id);
+
+        if (data.Contains(Constants.ADD_PRODUCTS))
+        {
+            var product = buffer[data.Substring(data.IndexOf(';') + 1)];
+            product.UserId = userId;
+            await _productService.Add(product);
+        }
+        else if (data.Contains(Constants.ADD_FAVORITE_PRODUCTS))
+        {
+            var product = buffer[data.Substring(data.IndexOf(';') + 1)];
+            product.UserId = userId;
+            await _productService.Add(product);
+        }
+        else if (data.Contains(Constants.MY_PRODUCTS))
+        {
+            //"event;do;id"
+            int productId = int.Parse(data.Split(";").Last());
+            if (data.Contains("+"))
+            {
+                await _productService.Increase(productId);
+            }
+            if (data.Contains("-"))
+            {
+
+            }
+            if (data.Contains("Del"))
+            {
+
+            }
+        }
+        await client.SendTextMessageAsync(
+                update.CallbackQuery.From.Id,
+                text: "Ok!");
+    }
     private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
     {
         if(update.Type == UpdateType.CallbackQuery)
         {
-            
-            var data = update.CallbackQuery.Data;
-            var product = await _barcodeLookupService.Get(data.Substring(data.IndexOf(';')));
-            product.UserId = await _userService.GetMyId(update.CallbackQuery.From.Id);
-            if(data.Contains(Constants.ADD_PRODUCTS))
-            {
-                await _productService.Add(product);
-            }
-            else if(data.Contains(Constants.ADD_FAVORITE_PRODUCTS))
-            {
-               await _productService.Add(product);
-
-            }
+            CallbackQueryHandler(update);
+            return;
         }
-        if(update.Message.Type == MessageType.Photo)
+        if(update?.Message?.Type == MessageType.Photo)
         {
             var fileId = update.Message.Photo.Last().FileId;
             var fileInfo = await client.GetFileAsync(fileId);
@@ -110,17 +150,18 @@ public class TgBot
                         ,Constants.ADD_PRODUCTS + ";" + resultReading.Text)
                     }
                 });
+                buffer[resultReading.Text] = await _upcitemdbService.Get(resultReading.Text);
                 await client.SendTextMessageAsync(
                     update.Message.From.Id,
-                    text: (await _barcodeLookupService.Get(resultReading.Text)).Name, 
+                    text: buffer[resultReading.Text].Name,
                     replyMarkup: inlineKeyboard);
 
             }
 
-            
 
+            return;
         }
-        if (update.Message.Text == "/start")
+        if (update?.Message?.Text == "/start")
         {
             await _registrationService.SignUp(update.Message.From.ToUsers());
 
@@ -139,31 +180,43 @@ public class TgBot
             }
             ReplyKeyboardMarkup checkBarcode = new(new KeyboardButton[][]
             {
-                new KeyboardButton[] {Constants.CHECK_PRODUCT_BUTTON}
+                new KeyboardButton[] {Constants.CHECK_PRODUCT_BUTTON},
+                new KeyboardButton[] {Constants.MY_PRODUCTS},
             });
             await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
                 text: "Check my product!",
                 replyMarkup: checkBarcode);
-            
+            return;
         }
-        HandleUser(update);
+        HandleUser(update!);
         
     }
 
     private async void HandleUser (Update update)
     {
-        if (update.Message.Text == Constants.CHECK_PRODUCT_BUTTON)
+        if (update?.Message?.Text == Constants.CHECK_PRODUCT_BUTTON)
         {
             await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
                 text: "Send me your barcode!");
         }
-        if(update.Message.Text == Constants.MY_PRODUCTS)
+
+        if (update?.Message?.Text == Constants.MY_PRODUCTS)
         {
             
             var products = await _productService.GetAllProducts(update.Message.From.Id);
-            if(products == null)
+            InlineKeyboardMarkup productInlineKeyboard = new(
+                products.Select(x => new InlineKeyboardButton[] 
+                { 
+                    InlineKeyboardButton.WithCallbackData($"({x.Count}){x.Name}", Constants.MY_PRODUCTS + ";" + x.Id ),
+                    InlineKeyboardButton.WithCallbackData("+", Constants.MY_PRODUCTS + ";+;" + x.Id ),
+                    InlineKeyboardButton.WithCallbackData("-", Constants.MY_PRODUCTS + ";-;" + x.Id ),
+                    InlineKeyboardButton.WithCallbackData("Delete", Constants.MY_PRODUCTS + ";Del;" + x.Id )
+                }).ToArray()
+                );
+
+            if (products == null)
             {
                 await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
@@ -173,11 +226,13 @@ public class TgBot
             string productsList = string.Join('\n', products.Select(x=>x.Name));
             await client.SendTextMessageAsync(
                 chatId: update.Message.From.Id,
-                text: productsList);
+                text: "Your list:",
+                replyMarkup: productInlineKeyboard);
+
             
         }
 
-        if (update.Message.Text == Constants.SEND_USER_BUTTON && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
+        if (update?.Message?.Text == Constants.SEND_USER_BUTTON && _adminsIdService.AdminsId.Any(id => update.Message.From.Id == id))
         {
             var allTgIds = string.Join(", ", _userService.GetAll().Select(u => new { u.TgId, u.Name }));
 

@@ -12,19 +12,11 @@ namespace ProductBotManager.Repositiry
         public DbSet<Location> Locations { get; set; }
         public DbSet<FavoriteProduct> FavoriteProducts { get; set; }
         public DbSet<Users> Users { get; set; }
-        public AppDbContext()
-        {
-            //Task.Run(async () => await Database.EnsureCreatedAsync());
-            Database.EnsureCreated();
-        }
+
 
         public AppDbContext(DbContextOptions options) : base(options)
         {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            //optionsBuilder.UseSqlite("Data Source=DbProdBotManager.db ");
+            Database.EnsureCreated();
         }
 
     }

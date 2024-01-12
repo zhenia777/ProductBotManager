@@ -11,6 +11,7 @@ using ProductBotManager.Services.ProductService;
 using ProductBotManager.Services.RegistrationService;
 using ProductBotManager.Services.ShopService;
 using ProductBotManager.Services.TokenService;
+using ProductBotManager.Services.UpcitemdbService;
 using ProductBotManager.Services.UserService;
 using ProductBotManager.TgBot;
 
@@ -27,7 +28,9 @@ var services = new ServiceCollection()
     .AddTransient<IRegistrationService, RegistrationService>()
     .AddTransient<IAdminsIdService, AdminsIdService>()
     .AddTransient<IUserService, UserService>()
-    .AddTransient<IBarcodeLookupService, BarcodeLookupService>() ;
+    .AddTransient<IBarcodeLookupService, BarcodeLookupService>()
+    .AddTransient<IUpcitemdbService, UpcitemdbService>();
+
 
 using var provider = services.BuildServiceProvider();
 
