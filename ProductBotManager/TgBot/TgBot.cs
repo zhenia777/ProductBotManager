@@ -96,49 +96,44 @@ public class TgBot
             }
             if (data.Contains("-"))
             {
-
+                await _productService.Decrease(productId);
             }
             if (data.Contains("Del"))
             {
-
+                await _productService.Delete(productId);
             }
         }
         await client.SendTextMessageAsync(
                 update.CallbackQuery.From.Id,
                 text: "Ok!");
     }
-    private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
-    {
-        if(update.Type == UpdateType.CallbackQuery)
-        {
-            CallbackQueryHandler(update);
-            return;
-        }
-        if(update?.Message?.Type == MessageType.Photo)
-        {
-            var fileId = update.Message.Photo.Last().FileId;
-            var fileInfo = await client.GetFileAsync(fileId);
-            using Stream fileStream = new MemoryStream();
-            await client.DownloadFileAsync(
-                fileInfo.FilePath,
-                fileStream
-                ) ;
 
-            BarcodeReader barcodeReader = new BarcodeReader();
-            
-            Bitmap bitmap = new Bitmap(fileStream);
-            var convertBitmap = new BitmapLuminanceSource(bitmap);
-            var resultReading = barcodeReader.Decode(convertBitmap);
-            if(resultReading == null)
+
+    private async Task HandlePhotoUpdate(ITelegramBotClient bot, Update update)
+    {
+        var fileId = update.Message.Photo.Last().FileId;
+        var fileInfo = await client.GetFileAsync(fileId);
+        using Stream fileStream = new MemoryStream();
+        await client.DownloadFileAsync(
+            fileInfo.FilePath,
+            fileStream
+            );
+
+        BarcodeReader barcodeReader = new BarcodeReader();
+
+        Bitmap bitmap = new Bitmap(fileStream);
+        var convertBitmap = new BitmapLuminanceSource(bitmap);
+        var resultReading = barcodeReader.Decode(convertBitmap);
+        if (resultReading == null)
+        {
+            await client.SendTextMessageAsync(
+                update.Message.From.Id,
+                text: "I couldn`t read your photo! ((");
+        }
+        else
+        {
+            InlineKeyboardMarkup inlineKeyboard = new(new[]
             {
-                await client.SendTextMessageAsync(
-                    update.Message.From.Id,
-                    text: "I couldn`t read your photo! ((");
-            }
-            else
-            {
-                InlineKeyboardMarkup inlineKeyboard = new(new[]
-                {
                     new[]
                     {
                         InlineKeyboardButton.WithCallbackData(Constants.ADD_FAVORITE_PRODUCTS
@@ -150,15 +145,26 @@ public class TgBot
                         ,Constants.ADD_PRODUCTS + ";" + resultReading.Text)
                     }
                 });
-                buffer[resultReading.Text] = await _upcitemdbService.Get(resultReading.Text);
-                await client.SendTextMessageAsync(
-                    update.Message.From.Id,
-                    text: buffer[resultReading.Text].Name,
-                    replyMarkup: inlineKeyboard);
+            buffer[resultReading.Text] = await _upcitemdbService.Get(resultReading.Text);
+            await client.SendTextMessageAsync(
+                update.Message.From.Id,
+                text: buffer[resultReading.Text].Name,
+                replyMarkup: inlineKeyboard);
 
-            }
+        }
+    }
 
 
+        private async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken clt)
+        {
+        if(update.Type == UpdateType.CallbackQuery)
+        {
+            CallbackQueryHandler(update);
+            return;
+        }
+        if (update?.Message?.Type == MessageType.Photo)
+        {
+            HandlePhotoUpdate(bot, update);
             return;
         }
         if (update?.Message?.Text == "/start")
